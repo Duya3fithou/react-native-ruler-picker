@@ -111,6 +111,7 @@ export type RulerPickerProps = {
    *
    * @param value
    */
+  displayMode?: 'decimal' | 'integer' | 'tens' | 'feet';
   onValueChange?: (value: string) => void;
   /**
    * Callback when the value changes end
@@ -142,6 +143,7 @@ export const RulerPicker = ({
   decelerationRate = 'normal',
   onValueChange,
   onValueChangeEnd,
+  displayMode = 'decimal',
 }: RulerPickerProps) => {
   const itemAmount = (max - min) / step;
   const arrData = Array.from({ length: itemAmount + 1 }, (_, index) => index);
@@ -216,6 +218,9 @@ export const RulerPicker = ({
           stepWidth={stepWidth}
           shortStepColor={shortStepColor}
           longStepColor={longStepColor}
+          min={min}
+          step={step}
+          displayMode={displayMode}
         />
       );
     },
@@ -227,6 +232,9 @@ export const RulerPicker = ({
       longStepHeight,
       shortStepColor,
       shortStepHeight,
+      min,
+      step,
+      displayMode,
     ]
   );
 

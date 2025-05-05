@@ -45,13 +45,13 @@
     "react-native-picker",
     "react-native-ruler"
   ],
-  "repository": "https://github.com/rnheroes/react-native-ruler-picker",
-  "author": "React Native Heroes <yigithanyucedag@gmail.com> (https://github.com/rnheroes)",
+  "repository": "https://github.com/Duya3fithou/react-native-ruler-picker",
+  "author": "React Native Heroes <yigithanyucedag@gmail.com> (https://github.com/Duya3fithou)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rnheroes/react-native-ruler-picker/issues"
+    "url": "https://github.com/Duya3fithou/react-native-ruler-picker/issues"
   },
-  "homepage": "https://github.com/rnheroes/react-native-ruler-picker#readme",
+  "homepage": "https://github.com/Duya3fithou/react-native-ruler-picker#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -88,7 +88,7 @@
   "engines": {
     "node": ">= 16.0.0"
   },
-  "packageManager": "^yarn@1.22.15",
+  "packageManager": "yarn@1.22.22",
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
