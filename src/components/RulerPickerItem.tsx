@@ -91,8 +91,8 @@ export const RulerPickerItem = React.memo(
   }: Props) => {
     const isLong = index % 10 === 0;
     const height = isLong ? longStepHeight : shortStepHeight;
-    const textWidth = displayMode === 'feet' ? 40 : 30;
-    const textLeft = displayMode === 'feet' ? -17 : -15;
+    const textWidth = displayMode === 'feet' ? 45 : 30;
+    const textLeft = displayMode === 'feet' ? -20 : -15;
 
     // Tính toán giá trị hiển thị dựa trên displayMode
     let value;
