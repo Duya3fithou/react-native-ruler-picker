@@ -221,6 +221,7 @@ export const RulerPicker = ({
           min={min}
           step={step}
           displayMode={displayMode}
+          totalItems={arrData.length}
         />
       );
     },
