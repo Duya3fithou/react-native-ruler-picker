@@ -67,6 +67,10 @@ export type RulerPickerItemProps = {
    * @default 'decimal'
    */
   displayMode?: 'decimal' | 'integer' | 'tens' | 'feet';
+  /**
+   * Total number of items in the ruler
+   */
+  totalItems?: number;
 };
 
 type Props = {
@@ -88,8 +92,13 @@ export const RulerPickerItem = React.memo(
     step,
     fractionDigits = 1,
     displayMode = 'decimal',
+    totalItems,
   }: Props) => {
-    const isLong = index % 10 === 0;
+    // Nếu có ít hơn 15 items, chỉ item đầu và cuối là long step
+    // Ngược lại, áp dụng rule cũ: mỗi 10 item và item cuối
+    const isLong = totalItems && totalItems < 15
+      ? (index === 0 || isLast)
+      : (index % 10 === 0 || isLast);
     const height = isLong ? longStepHeight : shortStepHeight;
     const textWidth = displayMode === 'feet' ? 45 : 30;
     const textLeft = displayMode === 'feet' ? -20 : -15;
