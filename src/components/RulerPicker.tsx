@@ -146,7 +146,14 @@ export const RulerPicker = ({
   displayMode = 'decimal',
 }: RulerPickerProps) => {
   const itemAmount = (max - min) / step;
-  const arrData = Array.from({ length: itemAmount + 1 }, (_, index) => index);
+  const availableItemsCount = itemAmount + 1;
+  const extraItems = 20;
+  const firstAvailableIndex = extraItems;
+  const lastAvailableIndex = extraItems + availableItemsCount - 1;
+  const totalItems = availableItemsCount + extraItems * 2;
+  // Giá trị min ảo dùng cho việc tính toán, để bù trừ phần extraItems ở đầu
+  const minForCalculation = min - firstAvailableIndex * step;
+  const arrData = Array.from({ length: totalItems }, (_, index) => index);
   const listRef = useRef<FlashList<typeof arrData>>(null);
 
   const stepTextRef = useRef<TextInput>(null);
@@ -162,7 +169,7 @@ export const RulerPicker = ({
         value,
         stepWidth,
         gapBetweenSteps,
-        min,
+        minForCalculation,
         max,
         step,
         fractionDigits
@@ -175,7 +182,15 @@ export const RulerPicker = ({
 
       prevValue.current = newStep;
     },
-    [fractionDigits, gapBetweenSteps, stepWidth, max, min, onValueChange, step]
+    [
+      fractionDigits,
+      gapBetweenSteps,
+      stepWidth,
+      max,
+      minForCalculation,
+      onValueChange,
+      step,
+    ]
   );
 
   useEffect(() => {
@@ -211,6 +226,8 @@ export const RulerPicker = ({
       return (
         <RulerPickerItem
           isLast={index === arrData.length - 1}
+          isInactive={index < firstAvailableIndex || index > lastAvailableIndex}
+          firstAvailableIndex={firstAvailableIndex}
           index={index}
           shortStepHeight={shortStepHeight}
           longStepHeight={longStepHeight}
@@ -227,6 +244,8 @@ export const RulerPicker = ({
     },
     [
       arrData.length,
+      firstAvailableIndex,
+      lastAvailableIndex,
       gapBetweenSteps,
       stepWidth,
       longStepColor,
@@ -241,15 +260,31 @@ export const RulerPicker = ({
 
   const onMomentumScrollEnd = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const position =
+        event.nativeEvent.contentOffset.x ||
+        event.nativeEvent.contentOffset.y ||
+        0;
+      const rawIndex = Math.round(position / (stepWidth + gapBetweenSteps));
       const newStep = calculateCurrentValue(
-        event.nativeEvent.contentOffset.x || event.nativeEvent.contentOffset.y,
+        position,
         stepWidth,
         gapBetweenSteps,
-        min,
+        minForCalculation,
         max,
         step,
         fractionDigits
       );
+
+      // Nếu dừng lại ở vùng ngoài min/max thì scroll về min hoặc max
+      if (rawIndex < firstAvailableIndex || rawIndex > lastAvailableIndex) {
+        const targetIndex =
+          rawIndex < firstAvailableIndex ? firstAvailableIndex : lastAvailableIndex;
+        const targetOffset = targetIndex * (stepWidth + gapBetweenSteps);
+        listRef.current?.scrollToOffset({
+          offset: targetOffset,
+          animated: true,
+        });
+      }
 
       if (prevMomentumValue.current !== newStep) {
         onValueChangeEnd?.(newStep);
@@ -262,13 +297,16 @@ export const RulerPicker = ({
       gapBetweenSteps,
       stepWidth,
       max,
-      min,
+      minForCalculation,
       onValueChangeEnd,
       step,
+      firstAvailableIndex,
+      lastAvailableIndex,
     ]
   );
   function onContentSizeChange() {
-    const initialIndex = Math.floor((initialValue - min) / step);
+    const initialIndex =
+      firstAvailableIndex + Math.floor((initialValue - min) / step);
     listRef.current?.scrollToOffset({
       offset: initialIndex * (stepWidth + gapBetweenSteps),
       animated: false,
@@ -298,6 +336,7 @@ export const RulerPicker = ({
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         horizontal
+        bounces
       />
       <View
         pointerEvents="none"
