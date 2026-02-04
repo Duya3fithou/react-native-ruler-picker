@@ -71,6 +71,15 @@ export type RulerPickerItemProps = {
    * Total number of items in the ruler
    */
   totalItems?: number;
+  /**
+   * Mark item as inactive (outside min/max range)
+   * to render with lower opacity
+   */
+  isInactive?: boolean;
+  /**
+   * Index của vạch min trong toàn bộ mảng (dùng để dịch index)
+   */
+  firstAvailableIndex?: number;
 };
 
 type Props = {
@@ -82,6 +91,8 @@ export const RulerPickerItem = React.memo(
   ({
     isLast,
     index,
+    isInactive = false,
+    firstAvailableIndex = 0,
     gapBetweenSteps,
     shortStepHeight,
     longStepHeight,
@@ -94,11 +105,15 @@ export const RulerPickerItem = React.memo(
     displayMode = 'decimal',
     totalItems,
   }: Props) => {
+    // Index tương đối, tính từ vạch min
+    const relativeIndex = index - firstAvailableIndex;
+
     // Nếu có ít hơn 15 items, chỉ item đầu và cuối là long step
     // Ngược lại, áp dụng rule cũ: mỗi 10 item và item cuối
-    const isLong = totalItems && totalItems < 15
-      ? (index === 0 || isLast)
-      : (index % 10 === 0 || isLast);
+    const isLong =
+      totalItems && totalItems < 15
+        ? index === 0 || isLast
+        : relativeIndex % 10 === 0 || isLast;
     const height = isLong ? longStepHeight : shortStepHeight;
     const textWidth = displayMode === 'feet' ? 45 : 30;
     const textLeft = displayMode === 'feet' ? -20 : -15;
@@ -107,14 +122,14 @@ export const RulerPickerItem = React.memo(
     let value;
     switch (displayMode) {
       case 'integer':
-        value = Math.round(index * step + min).toString();
+        value = Math.round(relativeIndex * step + min).toString();
         break;
       case 'tens':
-        value = Math.round((index * step + min) / 10) * 10;
+        value = Math.round((relativeIndex * step + min) / 10) * 10;
         break;
       case 'feet': {
         // Giả sử min/step là inch, hoặc bạn có thể điều chỉnh lại cho phù hợp
-        const totalInches = index * step + min;
+        const totalInches = relativeIndex * step + min;
         const feet = Math.floor(totalInches / 12);
         const inches = Math.round(totalInches % 12);
         value = `${feet}' ${inches}\"`;
@@ -122,7 +137,7 @@ export const RulerPickerItem = React.memo(
       }
       case 'decimal':
       default:
-        value = (index * step + min).toFixed(fractionDigits);
+        value = (relativeIndex * step + min).toFixed(fractionDigits);
     }
 
     return (
@@ -134,6 +149,7 @@ export const RulerPickerItem = React.memo(
             justifyContent: 'center',
             marginRight: isLast ? 0 : gapBetweenSteps,
             marginTop: shortStepHeight,
+            opacity: isInactive ? 0.3 : 1,
           },
         ]}
       >
