@@ -228,6 +228,7 @@ export const RulerPicker = ({
           isLast={index === arrData.length - 1}
           isInactive={index < firstAvailableIndex || index > lastAvailableIndex}
           firstAvailableIndex={firstAvailableIndex}
+          lastAvailableIndex={lastAvailableIndex}
           index={index}
           shortStepHeight={shortStepHeight}
           longStepHeight={longStepHeight}
