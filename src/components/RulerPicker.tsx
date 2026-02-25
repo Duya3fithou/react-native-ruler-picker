@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Dimensions,
   StyleSheet,
@@ -156,10 +156,22 @@ export const RulerPicker = ({
   const arrData = Array.from({ length: totalItems }, (_, index) => index);
   const listRef = useRef<FlashList<typeof arrData>>(null);
 
+  console.log('max: ', max);
+
+  const fractionDigitsWithDisplayMode = useMemo(() => {
+    if (displayMode === 'feet') {
+      return 0;
+    }
+    if (Number(max) > 100) {
+      return 0;
+    }
+    return fractionDigits;
+  }, [displayMode, fractionDigits, initialValue]);
+
   const stepTextRef = useRef<TextInput>(null);
-  const prevValue = useRef<string>(initialValue.toFixed(fractionDigits));
+  const prevValue = useRef<string>(initialValue.toFixed(fractionDigitsWithDisplayMode));
   const prevMomentumValue = useRef<string>(
-    initialValue.toFixed(fractionDigits)
+    initialValue.toFixed(fractionDigitsWithDisplayMode)
   );
   const scrollPosition = useRef(new Animated.Value(0)).current;
 
@@ -172,7 +184,7 @@ export const RulerPicker = ({
         minForCalculation,
         max,
         step,
-        fractionDigits
+        fractionDigitsWithDisplayMode
       );
 
       if (prevValue.current !== newStep) {
@@ -240,6 +252,7 @@ export const RulerPicker = ({
           step={step}
           displayMode={displayMode}
           totalItems={arrData.length}
+          fractionDigits={fractionDigitsWithDisplayMode}
         />
       );
     },
@@ -256,6 +269,7 @@ export const RulerPicker = ({
       min,
       step,
       displayMode,
+      fractionDigitsWithDisplayMode,
     ]
   );
 
@@ -273,7 +287,7 @@ export const RulerPicker = ({
         minForCalculation,
         max,
         step,
-        fractionDigits
+        fractionDigitsWithDisplayMode
       );
 
       // Nếu dừng lại ở vùng ngoài min/max thì scroll về min hoặc max
@@ -294,7 +308,7 @@ export const RulerPicker = ({
       prevMomentumValue.current = newStep;
     },
     [
-      fractionDigits,
+      fractionDigitsWithDisplayMode,
       gapBetweenSteps,
       stepWidth,
       max,
@@ -373,7 +387,7 @@ export const RulerPicker = ({
         >
           <TextInput
             ref={stepTextRef}
-            defaultValue={initialValue.toFixed(fractionDigits)}
+            defaultValue={initialValue.toFixed(fractionDigitsWithDisplayMode)}
             style={[
               {
                 lineHeight:
