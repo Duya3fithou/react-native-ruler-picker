@@ -123,8 +123,7 @@ export const RulerPickerItem = React.memo(
         ? index === firstAvailableIndex || isLastAvailable
         : relativeIndex % 10 === 0 || isLastAvailable;
     const height = isLong ? longStepHeight : shortStepHeight;
-    const textWidth = displayMode === 'feet' ? 45 : 30;
-    const textLeft = displayMode === 'feet' ? -20 : -15;
+
 
     // Tính toán giá trị hiển thị dựa trên displayMode
     let value;
@@ -147,6 +146,9 @@ export const RulerPickerItem = React.memo(
       default:
         value = (relativeIndex * step + min).toFixed(fractionDigits);
     }
+
+    const textWidth = displayMode === 'feet' ? 45 : 30;
+    const textLeft = displayMode === 'feet' ? -20 : -15;
 
     return (
       <View
